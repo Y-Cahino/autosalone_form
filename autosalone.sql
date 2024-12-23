@@ -20,6 +20,7 @@ CREATE TABLE `autosalone` (
 
 --
 -- Indici per le tabelle `autosalone`
+--
 CREATE TABLE 'autosalone'(
   'bunghID' INT(11) NOT NULL AUTO_INCREMENT,
   'modello_id' INT(11) NOT NULL,
@@ -51,3 +52,17 @@ CREATE TABLE 'modelli'(
   'modello_n' VARCHAR(20) NOT NULL,
   PRIMARY KEY ('id')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--Inserimento Dati
+INSERT INTO 'modelli'('modello_n') VALUES
+('Panda'), ('C3'), ('Yaris GR');
+INSERT INTO 'marche'('marca_n') VALUES
+('Fiat'), ('Citroén'), ('Toyota');
+INSERT INTO 'anni'('anno') VALUES
+(2015), (2017), (2020);
+INSERT INTO 'prezzi'('prezzo') VALUES
+(9999), (12450), (17000);
+INSERT INTO 'autosalone'('modello_id', 'anno_produzione', 'prezzo_id', 'marca_id', 'n_u', 'promo') VALUES
+(1, 2015, 1, 1, 0, 0, 0),
+(2, 2017, 2, 2, 0, 0, 0),
+(3, 2020, 3, 3, 0, 0, 0);
