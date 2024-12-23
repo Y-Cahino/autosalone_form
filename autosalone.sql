@@ -35,3 +35,19 @@ CREATE TABLE 'autosalone'(
   FOREIGN KEY (`prezzo_id`) REFERENCES `prezzi`(`id`),
   FOREIGN KEY (`marca_id`) REFERENCES `marche`(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE 'marche'(
+  'id' INT(11) NOT NULL AUTO_INCREMENT,
+  'marca_n' VARCHAR(20) NOT NULL,
+  PRIMARY KEY ('id')
+) NGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE 'anni'(
+  'anno' INT(4) NOT NULL,
+  PRIMARY KEY ('anno')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE 'modelli'(
+  'id' INT(11) NOT NULL AUTO_INCREMENT,
+  'modello_n' VARCHAR(20) NOT NULL,
+  PRIMARY KEY ('id')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
