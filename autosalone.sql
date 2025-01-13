@@ -33,6 +33,10 @@ CREATE TABLE modelli(
   PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE prezzi(
+  prezzo INT(11) NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (prezzo)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb64;
 --Inserimento Dati
 INSERT INTO modelli(modello_n) VALUES
 (Panda), (C3), (Yaris GR);
