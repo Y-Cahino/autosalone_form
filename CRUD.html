@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestione Autosalone</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+        header {
+            background: #333;
+            color: #fff;
+            padding-top: 30px;
+            min-height: 70px;
+            border-bottom: #0779e4 3px solid;
+        }
+        header a {
+            color: #fff;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 16px;
+        }
+        #main {
+            padding: 30px;
+            background: #fff;
+        }
+        .btn {
+            display: inline-block;
+            color: #fff;
+            background: #0779e4;
+            padding: 10px 20px;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        table {
+            width: 100%;
+            margin: 20px 0;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Gestione Autosalone</h1>
+        </div>
+    </header>
+    <div class="container" id="main">
+        <h2>Elenco Veicoli</h2>
+        <a href="add.php" class="btn">Aggiungi Nuovo Veicolo</a>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Modello</th>
+                    <th>Anno</th>
+                    <th>Prezzo</th>
+                    <th>Marca</th>
+                    <th>Nuovo/Usato</th>
+                    <th>Promo</th>
+                    <th>Azioni</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                include 'config.php';
+                $sql = "SELECT autosalone.bunghID, modelli.modello_n, anni.anno, prezzi.prezzo, marche.marca_n, autosalone.n_u, autosalone.promo FROM autosalone 
+                        JOIN modelli ON autosalone.modello_id = modelli.id 
+                        JOIN anni ON autosalone.anno_produzione = anni.anno 
+                        JOIN prezzi ON autosalone.prezzo_id = prezzi.id 
+                        JOIN marche ON autosalone.marca_id = marche.id";
+                $result = $conn->query($sql);
+                if ($result->num_rows > 0) {
+                    while($row = $result->fetch_assoc()) {
+                        echo "<tr>";
+                        echo "<td>{$row['bunghID']}</td>";
+                        echo "<td>{$row['modello_n']}</td>";
+                        echo "<td>{$row['anno']}</td>";
+                        echo "<td>{$row['prezzo']} &euro;</td>";
+                        echo "<td>{$row['marca_n']}</td>";
+                        echo "<td>" . ($row['n_u'] ? 'Nuovo' : 'Usato') . "</td>";
+                        echo "<td>" . ($row['promo'] ? 'Si' : 'No') . "</td>";
+                        echo "<td><a href='edit.php?id={$row['bunghID']}' class='btn'>Modifica</a> <a href='delete.php?id={$row['bunghID']}' class='btn'>Elimina</a></td>";
+                        echo "</tr>";
+                    }
+                } else {
+                    echo "<tr><td colspan='8'>Nessun veicolo trovato</td></tr>";
+                }
+                $conn->close();
+                ?>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
+
+// File: config.php
+<?php
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "autosaloni";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+?>
+
+// File: add.php
+<?php
+include 'config.php';
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $modello_id = $_POST['modello_id'];
+    $anno_produzione = $_POST['anno_produzione'];
+    $prezzo_id = $_POST['prezzo_id'];
+    $marca_id = $_POST['marca_id'];
+    $n_u = $_POST['n_u'];
+    $promo = $_POST['promo'];
+
+    $sql = "INSERT INTO autosalone (modello_id, anno_produzione, prezzo_id, marca_id, n_u, promo) VALUES ('$modello_id', '$anno_produzione', '$prezzo_id', '$marca_id', '$n_u', '$promo')";
+
+    if ($conn->query($sql) === TRUE) {
+        echo "Nuovo veicolo aggiunto con successo";
+    } else {
+        echo "Errore: " . $sql . "<br>" . $conn->error;
+    }
+}
+$conn->close();
+?>
+<form method="POST" action="add.php">
+    Modello ID: <input type="text" name="modello_id"><br>
+    Anno Produzione: <input type="text" name="anno_produzione"><br>
+    Prezzo ID: <input type="text" name="prezzo_id"><br>
+    Marca ID: <input type="text" name="marca_id"><br>
+    Nuovo/Usato: <input type="text" name="n_u"><br>
+    Promo: <input type="text" name="promo"><br>
+    <input type="submit" value="Aggiungi Veicolo">
+</form>
+
+// File: edit.php
+<?php
+include 'config.php';
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $bunghID = $_POST['bunghID'];
+    $modello_id = $_POST['modello_id'];
+    $anno_produzione = $_POST['anno_produzione'];
+    $prezzo_id = $_POST['prezzo_id'];
+    $marca_id = $_POST['marca_id'];
+    $n_u = $_POST['n_u'];
+    $promo = $_POST['promo'];
+
+    $sql = "UPDATE autosalone SET modello_id='$modello_id', anno_produzione='$anno_produzione', prezzo_id='$prezzo_id', marca_id='$marca_id', n_u='$n_u', promo='$promo' WHERE bunghID='$bunghID'";
+
+    if ($conn->query($sql) === TRUE) {
+        echo "Veicolo aggiornato con successo";
+    } else {
+        echo "Errore: " . $sql . "<br>" . $conn->error;
+    }
+}
+$conn->close();
+?>
+<form method="POST" action="edit.php">
+    ID: <input type="text" name="bunghID" value="<?php echo $_GET['id']; ?>" readonly><br>
+    Modello ID: <input type="text" name="modello_id"><br>
+    Anno Produzione: <input type="text" name="anno_produzione"><br>
+    Prezzo ID: <input type="text" name="prezzo_id"><br>
+    Marca ID: <input type="text" name="marca_id"><br>
+    Nuovo/Usato: <input type="text" name="n_u"><br>
+    Promo: <input type="text" name="promo"><br>
+    <input type="submit" value="Aggiorna Veicolo">
+</form>
+
+// File: delete.php
+<?php
+include 'config.php';
+if (isset($_GET['id'])) {
+    $bunghID = $_GET['id'];
+    $sql = "DELETE FROM autosalone WHERE bunghID='$bunghID'";
+    if ($conn->query($sql) === TRUE) {
+        echo "Veicolo eliminato con successo";
+    } else {
+        echo "Errore: " . $sql . "<br>" . $conn->error;
+    }
+}
+$conn->close();
+?>
