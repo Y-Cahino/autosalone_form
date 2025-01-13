@@ -1,5 +1,5 @@
 CREATE DATABASE IF NOT EXISTS autosaloni;
-USE 'autosaloni';
+USE autosaloni;
 CREATE TABLE `autosalone` (
   `bunghID` int(11) NOT NULL,
   `Modello` varchar(20) NOT NULL,
