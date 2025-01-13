@@ -1,4 +1,4 @@
-CREATE DATABASE IF NOT EXISTS 'autosaloni';
+CREATE DATABASE IF NOT EXISTS autosaloni;
 USE 'autosaloni';
 CREATE TABLE `autosalone` (
   `bunghID` int(11) NOT NULL,
