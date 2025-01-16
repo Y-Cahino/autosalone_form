@@ -5,16 +5,18 @@ CREATE TABLE autosalone(
   bunghID INT(11) NOT NULL AUTO_INCREMENT,
   modello_id INT(11) NOT NULL,
   anno_produzione INT(4) NOT NULL,
-  prezzo_id INT(11) NOT NULL,
+  prezzo INT(11) NOT NULL,
   marca_id INT(11) NOT NULL,
   n_u TINYINT(1) NOT NULL,
   test_drive TINYINT(1) NOT NULL,
   promo INT(3) DEFAULT 0,
   PRIMARY KEY (bunghID),
-  FOREIGN KEY (modello_id) REFERENCES modelli(id),
-  FOREIGN KEY (anno_produzione) REFERENCES anni(anno),
-  FOREIGN KEY (prezzo_id) REFERENCES prezzi(id),
-  FOREIGN KEY (marca_id) REFERENCES marche(id)
+  CONSTRAINT Models FOREIGN KEY (modello_id)
+    REFERENCES modelli(id),
+  CONSTRAINT Anno_PR FOREIGN KEY (anno_produzione)
+    REFERENCES anni(anno),
+  CONSTRAINT FOREIGN KEY (marca_id)
+    REFERENCES marche(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE marche(
@@ -33,18 +35,14 @@ CREATE TABLE modelli(
   PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE prezzi(
-  id INT(11) NOT NULL AUTO_INCREMENT,
-  PRIMARY KEY (prezzo)
-  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb64;
---Inserimento Dati
+
 INSERT INTO modelli(modello_n) VALUES
 (Panda), (C3), (Yaris GR);
 INSERT INTO marche(marca_n) VALUES
 (Fiat), (Citroén), (Toyota);
 INSERT INTO anni(anno) VALUES
 (2015), (2017), (2020);
-INSERT INTO prezzi(prezzo) VALUES
+INSERT INTO autosalone(prezzo) VALUES
 (9999), (12450), (17000);
 INSERT INTO autosalone(modello_id, anno_produzione, prezzo_id, marca_id, n_u, promo) VALUES
 (1, 2015, 1, 1, 0, 0, 0),
