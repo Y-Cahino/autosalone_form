@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
-using System.Drawing;
 using System.Windows.Forms;
 using MySql.Data.MySqlClient;
 
@@ -23,20 +23,119 @@ namespace autosalone_form
             dataGridView3.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
 
             // Imposta la scheda inizialmente selezionata
-            tabControl1.SelectedIndex = 2;
+            tabControl1.SelectedIndex = 0;
 
-            // Carica i dati nella griglia al caricamento del controllo
-            LoadData();
+            // Carica i dati nelle griglie al caricamento del controllo
+            LoadDataMarche();
+            LoadDataModelli();
+            LoadDataAutosalone();
+            LoadDataAnni();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        // Caricamento dei dati per le marche
+        private void LoadDataMarche()
         {
-            // Aggiungere una marca all'inventario
-            if (!string.IsNullOrWhiteSpace(textBox1.Text))
+            using (var conn = new MySqlConnection(ConnectionString))
             {
-                AddMarca(textBox1.Text);
-                LoadData();
-                textBox1.Clear();
+                try
+                {
+                    conn.Open();
+                    string sql = "SELECT * FROM marche";
+                    using (var cmd = new MySqlCommand(sql, conn))
+                    using (var adapter = new MySqlDataAdapter(cmd))
+                    {
+                        DataTable dati = new DataTable();
+                        adapter.Fill(dati);
+                        dataGridView1.DataSource = dati;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Errore durante il caricamento delle marche: {ex.Message}", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        // Caricamento dei dati per i modelli
+        private void LoadDataModelli()
+        {
+            using (var conn = new MySqlConnection(ConnectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    string sql = "SELECT * FROM modelli";
+                    using (var cmd = new MySqlCommand(sql, conn))
+                    using (var adapter = new MySqlDataAdapter(cmd))
+                    {
+                        DataTable dati = new DataTable();
+                        adapter.Fill(dati);
+                        dataGridView2.DataSource = dati;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Errore durante il caricamento dei modelli: {ex.Message}", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        // Caricamento dei dati per l'autosalone
+        private void LoadDataAutosalone()
+        {
+            using (var conn = new MySqlConnection(ConnectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    string sql = "SELECT * FROM autosalone";
+                    using (var cmd = new MySqlCommand(sql, conn))
+                    using (var adapter = new MySqlDataAdapter(cmd))
+                    {
+                        DataTable dati = new DataTable();
+                        adapter.Fill(dati);
+                        dataGridView3.DataSource = dati;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Errore durante il caricamento degli autosaloni: {ex.Message}", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        // Caricamento dei dati per gli anni
+        private void LoadDataAnni()
+        {
+            using (var conn = new MySqlConnection(ConnectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    string sql = "SELECT * FROM anni";
+                    using (var cmd = new MySqlCommand(sql, conn))
+                    using (var adapter = new MySqlDataAdapter(cmd))
+                    {
+                        DataTable dati = new DataTable();
+                        adapter.Fill(dati);
+                        dataGridView4.DataSource = dati; // Assuming dataGridView4 for years
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Errore durante il caricamento degli anni: {ex.Message}", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        // Aggiungi una nuova marca
+        private void buttonAddMarca_Click(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrWhiteSpace(textBoxMarca.Text))
+            {
+                AddMarca(textBoxMarca.Text);
+                LoadDataMarche();
+                textBoxMarca.Clear();
             }
             else
             {
@@ -44,6 +143,7 @@ namespace autosalone_form
             }
         }
 
+        // Funzione per aggiungere una marca
         private void AddMarca(string marca)
         {
             using (var conn = new MySqlConnection(ConnectionString))
@@ -51,7 +151,7 @@ namespace autosalone_form
                 try
                 {
                     conn.Open();
-                    string sql = "INSERT INTO marche (marca) VALUES (@marca)";
+                    string sql = "INSERT INTO marche (marca_n) VALUES (@marca)";
                     using (var cmd = new MySqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@marca", marca);
@@ -66,42 +166,125 @@ namespace autosalone_form
             }
         }
 
-        private void LoadData()
+        // Aggiungi un nuovo modello
+        private void buttonAddModello_Click(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrWhiteSpace(textBoxModello.Text) && comboBoxMarca.SelectedItem != null)
+            {
+                int marcaId = ((KeyValuePair<int, string>)comboBoxMarca.SelectedItem).Key;
+                AddModello(textBoxModello.Text, marcaId);
+                LoadDataModelli();
+                textBoxModello.Clear();
+            }
+            else
+            {
+                MessageBox.Show("Compila tutti i campi correttamente.", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
+        // Funzione per aggiungere un modello
+        private void AddModello(string modello, int marcaId)
         {
             using (var conn = new MySqlConnection(ConnectionString))
             {
                 try
                 {
                     conn.Open();
-                    string sql = "SELECT * FROM autosalone";
+                    string sql = "INSERT INTO modelli (modello_n, marca_id) VALUES (@modello, @marcaId)";
                     using (var cmd = new MySqlCommand(sql, conn))
-                    using (var adapter = new MySqlDataAdapter(cmd))
                     {
-                        DataTable dati = new DataTable();
-                        adapter.Fill(dati);
-                        dataGridView1.DataSource = dati;
+                        cmd.Parameters.AddWithValue("@modello", modello);
+                        cmd.Parameters.AddWithValue("@marcaId", marcaId);
+                        cmd.ExecuteNonQuery();
+                        MessageBox.Show("Modello aggiunto con successo.", "Successo", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Errore durante il caricamento dei dati: {ex.Message}", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"Errore durante l'aggiunta del modello: {ex.Message}", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
 
-        private void textBox1_TextChanged(object sender, EventArgs e)
+        // Aggiungi un nuovo autosalone
+        private void buttonAddAutosalone_Click(object sender, EventArgs e)
         {
-          
+            if (!string.IsNullOrWhiteSpace(textBoxModelloAutosalone.Text) && comboBoxAnno.SelectedItem != null && comboBoxMarcaAutosalone.SelectedItem != null)
+            {
+                int modelloId = ((KeyValuePair<int, string>)comboBoxModelloAutosalone.SelectedItem).Key;
+                int annoId = ((KeyValuePair<int, string>)comboBoxAnno.SelectedItem).Key;
+                int marcaId = ((KeyValuePair<int, string>)comboBoxMarcaAutosalone.SelectedItem).Key;
+                AddAutosalone(modelloId, annoId, marcaId);
+                LoadDataAutosalone();
+                textBoxModelloAutosalone.Clear();
+            }
+            else
+            {
+                MessageBox.Show("Compila tutti i campi correttamente.", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
 
-        private void tabPage3_Click(object sender, EventArgs e)
+        // Funzione per aggiungere un autosalone
+        private void AddAutosalone(int modelloId, int annoId, int marcaId)
         {
-        
+            using (var conn = new MySqlConnection(ConnectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    string sql = "INSERT INTO autosalone (modello_id, anno_produzione, marca_id) VALUES (@modelloId, @annoId, @marcaId)";
+                    using (var cmd = new MySqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@modelloId", modelloId);
+                        cmd.Parameters.AddWithValue("@annoId", annoId);
+                        cmd.Parameters.AddWithValue("@marcaId", marcaId);
+                        cmd.ExecuteNonQuery();
+                        MessageBox.Show("Autosalone aggiunto con successo.", "Successo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Errore durante l'aggiunta dell'autosalone: {ex.Message}", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
         }
 
-        private void tabPage1_Click(object sender, EventArgs e)
+        // Elimina una marca
+        private void buttonDeleteMarca_Click(object sender, EventArgs e)
         {
-         
+            if (dataGridView1.SelectedRows.Count > 0)
+            {
+                int marcaId = Convert.ToInt32(dataGridView1.SelectedRows[0].Cells[0].Value);
+                DeleteMarca(marcaId);
+                LoadDataMarche();
+            }
+            else
+            {
+                MessageBox.Show("Seleziona una marca da eliminare.", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
+        // Funzione per eliminare una marca
+        private void DeleteMarca(int marcaId)
+        {
+            using (var conn = new MySqlConnection(ConnectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    string sql = "DELETE FROM marche WHERE id = @marcaId";
+                    using (var cmd = new MySqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@marcaId", marcaId);
+                        cmd.ExecuteNonQuery();
+                        MessageBox.Show("Marca eliminata con successo.", "Successo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Errore durante l'eliminazione della marca: {ex.Message}", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
         }
     }
 }
