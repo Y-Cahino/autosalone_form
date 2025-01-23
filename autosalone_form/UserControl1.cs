@@ -91,17 +91,17 @@ namespace autosalone_form
 
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
-            // Gestore dell'evento TextChanged per textBox1 (non è necessario alcun codice qui, a meno che non serva specificamente)
+          
         }
 
         private void tabPage3_Click(object sender, EventArgs e)
         {
-            // Gestore dell'evento Click per tabPage3 (non necessario se non c'è logica aggiuntiva)
+        
         }
 
         private void tabPage1_Click(object sender, EventArgs e)
         {
-            // Gestore dell'evento Click per tabPage1 (non necessario se non c'è logica aggiuntiva)
+         
         }
     }
 }
