@@ -1,20 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using MySql.Data.MySqlClient;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Drawing;
 using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-using System.Data.SqlClient;
+using MySql.Data.MySqlClient;
 
 namespace autosalone_form
 {
-    public partial class UserControl1: UserControl
+    public partial class UserControl1 : UserControl
     {
+        private const string ConnectionString = "server=127.0.0.1;uid=root;pwd=;database=autosaloni";
+
         public UserControl1()
         {
             InitializeComponent();
@@ -22,48 +17,91 @@ namespace autosalone_form
 
         private void UserControl1_Load(object sender, EventArgs e)
         {
+            // Imposta il modo di selezione per le DataGridView
             dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dataGridView2.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dataGridView3.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+
+            // Imposta la scheda inizialmente selezionata
             tabControl1.SelectedIndex = 2;
+
+            // Carica i dati nella griglia al caricamento del controllo
+            LoadData();
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            //Aggiungere All'inventario
-            String ConnectionString = "server=127.0.0.1;uid=root;pwd=;database=autosaloni";
-            MySqlConnection conn = new MySqlConnection(ConnectionString);
-            conn.Open();
-            String sql = "insert into marche (marca) values('" + textBox1.Text + "');";
+            // Aggiungere una marca all'inventario
+            if (!string.IsNullOrWhiteSpace(textBox1.Text))
+            {
+                AddMarca(textBox1.Text);
+                LoadData();
+                textBox1.Clear();
+            }
+            else
+            {
+                MessageBox.Show("Il campo Marca non può essere vuoto.", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
 
-            MySqlCommand cmd = new MySqlCommand(sql, conn);
-            cmd.ExecuteNonQuery();
+        private void AddMarca(string marca)
+        {
+            using (var conn = new MySqlConnection(ConnectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    string sql = "INSERT INTO marche (marca) VALUES (@marca)";
+                    using (var cmd = new MySqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@marca", marca);
+                        cmd.ExecuteNonQuery();
+                        MessageBox.Show("Marca aggiunta con successo.", "Successo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Errore durante l'aggiunta della marca: {ex.Message}", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
 
-            //Visualizza dati
-            String sql1 = "select * from autosalone;";
-            MySqlCommand cmd1 = new MySqlCommand(sql1, conn);
-            cmd1.ExecuteNonQuery();
-            MySqlDataAdapter MyAdapter = new MySqlDataAdapter();
-            MyAdapter.SelectCommand = cmd1;
-            DataTable dati = new DataTable();
-            MyAdapter.Fill(dati);
-            dataGridView1.DataSource = dati;
-            conn.Close();
+        private void LoadData()
+        {
+            using (var conn = new MySqlConnection(ConnectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    string sql = "SELECT * FROM autosalone";
+                    using (var cmd = new MySqlCommand(sql, conn))
+                    using (var adapter = new MySqlDataAdapter(cmd))
+                    {
+                        DataTable dati = new DataTable();
+                        adapter.Fill(dati);
+                        dataGridView1.DataSource = dati;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Errore durante il caricamento dei dati: {ex.Message}", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
-
+            // Gestore dell'evento TextChanged per textBox1 (non è necessario alcun codice qui, a meno che non serva specificamente)
         }
 
         private void tabPage3_Click(object sender, EventArgs e)
         {
-
+            // Gestore dell'evento Click per tabPage3 (non necessario se non c'è logica aggiuntiva)
         }
 
         private void tabPage1_Click(object sender, EventArgs e)
         {
-
+            // Gestore dell'evento Click per tabPage1 (non necessario se non c'è logica aggiuntiva)
         }
     }
 }
